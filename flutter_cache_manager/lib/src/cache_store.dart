@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_cache_manager/src/storage/cache_object.dart';
 import 'package:flutter_cache_manager/src/storage/file_system/file_system.dart';
+import 'dart:io' as io;
 
 ///Flutter Cache Manager
 ///Copyright (c) 2019 Rene Floor
@@ -172,7 +173,9 @@ class CacheStore {
   }
 
   Future<void> _removeCachedFile(
-      CacheObject cacheObject, List<int> toRemove) async {
+    CacheObject cacheObject,
+    List<int> toRemove,
+  ) async {
     if (toRemove.contains(cacheObject.id)) return;
 
     toRemove.add(cacheObject.id!);
@@ -182,8 +185,9 @@ class CacheStore {
     if (_futureCache.containsKey(cacheObject.key)) {
       _futureCache.remove(cacheObject.key);
     }
-    final file = await fileSystem.createFile(cacheObject.relativePath);
-    if (await file.exists()) {
+    final file = io.File(cacheObject.relativePath);
+
+    if (file.existsSync()) {
       await file.delete();
     }
   }
